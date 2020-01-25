@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Occupancy-Grid-FastSLAM.xcodeproj">
+      location = "group:/Users/MatsSteinweg/Documents/C++_Projects/Occupancy-Grid-FastSLAM/Data">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>

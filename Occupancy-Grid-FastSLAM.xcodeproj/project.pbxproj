@@ -32,6 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D331E6B223DC52A2002809EE /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Data; path = "/Users/MatsSteinweg/Documents/C++_Projects/Occupancy-Grid-FastSLAM/Data"; sourceTree = "<absolute>"; };
 		D36E236923DB98F100CF58DF /* Area.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Area.h; sourceTree = "<group>"; };
 		D36E236A23DB98F100CF58DF /* Area.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Area.cpp; sourceTree = "<group>"; };
 		D36E236B23DB98F100CF58DF /* Robot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Robot.h; sourceTree = "<group>"; };
@@ -53,10 +54,6 @@
 		D36E237C23DB98F100CF58DF /* RBPF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RBPF.cpp; sourceTree = "<group>"; };
 		D36E237D23DB98F100CF58DF /* Sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sensor.cpp; sourceTree = "<group>"; };
 		D36E238723DB998100CF58DF /* Occupancy-Grid-FastSLAM.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Occupancy-Grid-FastSLAM.entitlements"; sourceTree = "<group>"; };
-		D36E238823DB9C9400CF58DF /* control_signals.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = control_signals.txt; sourceTree = "<group>"; };
-		D36E238923DB9C9400CF58DF /* parameters.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = parameters.txt; sourceTree = "<group>"; };
-		D36E238A23DB9C9400CF58DF /* map.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = map.jpg; sourceTree = "<group>"; };
-		D36E238B23DB9C9400CF58DF /* walls.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = walls.txt; sourceTree = "<group>"; };
 		D37450F723DB98A00032E5E4 /* Occupancy-Grid-FastSLAM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Occupancy-Grid-FastSLAM"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D37450FA23DB98A00032E5E4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,13 +72,10 @@
 		D37450EE23DB98A00032E5E4 = {
 			isa = PBXGroup;
 			children = (
+				D331E6B223DC52A2002809EE /* Data */,
 				D36E238723DB998100CF58DF /* Occupancy-Grid-FastSLAM.entitlements */,
 				D36E236A23DB98F100CF58DF /* Area.cpp */,
 				D36E236923DB98F100CF58DF /* Area.h */,
-				D36E238823DB9C9400CF58DF /* control_signals.txt */,
-				D36E238A23DB9C9400CF58DF /* map.jpg */,
-				D36E238923DB9C9400CF58DF /* parameters.txt */,
-				D36E238B23DB9C9400CF58DF /* walls.txt */,
 				D36E237823DB98F100CF58DF /* eigen2cv.h */,
 				D37450FA23DB98A00032E5E4 /* main.cpp */,
 				D36E236E23DB98F100CF58DF /* Map.cpp */,

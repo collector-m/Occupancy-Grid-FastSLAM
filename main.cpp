@@ -22,7 +22,8 @@ using namespace cv;
 int main(int argc, const char * argv[]) {
     
     // create simulation
-    Simulation *simulation = new Simulation("walls.txt", "parameters.txt", "control_signals.txt");
+    Simulation *simulation = new Simulation("Data/walls.txt", "Data/parameters.txt",
+                                            "Data/control_signals.txt");
     
     // run simulation
     simulation->run();
