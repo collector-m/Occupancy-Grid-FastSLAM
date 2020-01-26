@@ -20,18 +20,18 @@
 class Robot {
     
     public:
-        // constructors and destructor
+        // Constructors and destructor
         Robot();
         Robot(Eigen::Vector3f initial_pose);
         ~Robot(){};
     
-        // print summary of robot
+        // Print summary of robot
         void summary();
     
-        // drive robot
+        // Drive robot
         void drive(const float& delta_t);
     
-        // getter functions
+        // Getter functions
         Eigen::Vector3f& getPose(){ return this->pose; };
         Sensor& getSensor(){ return this->sensor; };
         RBPF& getFilter(){ return this->filter; };
@@ -41,11 +41,11 @@ class Robot {
         const float& getOmega(){ return this->omega; };
         const float& getTimestamp(){ return this->last_timestamp; };
 
-        // setter functions
+        // Setter functions
         void setV(const float& v){ this->v = v; };
         void setOmega(const float& omega){ this->omega = omega; };
-        void setSensor(Sensor sensor){ this->sensor = sensor; };
-        void setFilter(RBPF filter){ this->filter = filter; };
+        void setSensor(Sensor& sensor){ this->sensor = sensor; };
+        void setFilter(RBPF& filter){ this->filter = filter; };
 
     private:
         Eigen::Vector3f pose; // robot pose (x, y, theta)
@@ -56,7 +56,6 @@ class Robot {
         float radius; // radius of circular robot in m
         float v;  // translational velocity of the robot
         float omega; // angular velocity of the robot
-  
 };
 
 #endif /* Robot_h */

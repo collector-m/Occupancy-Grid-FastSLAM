@@ -19,21 +19,21 @@ using namespace cv;
 
 #define PI 3.14159265
 
-///////////////////
-// constructors //
-//////////////////
 
-// standard constructor
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++ Constructors +++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Standard constructor
 Robot::Robot() {
     
-    // set member variables
     this->pose = Eigen::Vector3f::Zero();
     this->last_timestamp = 0.0;
     this->radius = 0.5;
 }
 
 
-// constructor with initial position
+// Constructor with initial pose
 Robot::Robot(Eigen::Vector3f initial_pose) {
     
     // set member variables
@@ -43,42 +43,46 @@ Robot::Robot(Eigen::Vector3f initial_pose) {
 }
 
 
-//////////////
-// summary //
-/////////////
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++ Print Summary ++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void Robot::summary(){
     
-    cout << "Robot: \n";
-    cout << "------ \n";
-    cout << "Radius: " << this->radius << "m \n";
-    cout << "Pose: x: " << this->pose(0) << "m | y: " << this->pose(1) << "m | theta: " << this->pose(2) << "rad" << "\n";
+    cout << "Robot: " << endl;
+    cout << "------" << endl;
+    cout << "Radius: " << this->radius << "m" << endl;
+    cout << "Pose: x: " << this->pose(0) << "m | y: " << this->pose(1) << "m | theta: " << this->pose(2) << "rad" << endl;
+    cout << "Velocities: v: " << this->v << "m/s | omega: " << this->omega << "rad/s" << endl;
+    // Print sensor summary
     this->sensor.summary();
+    // Print filter summary
     this->filter.summary();
 
 }
 
 
-////////////
-// drive //
-///////////
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++ Drive robot ++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void Robot::drive(const float &delta_t){
         
-    // pose difference due to constant control signal applied over period of delta_t
+    // Pose difference due to constant control signal applied over period of delta_t
     Eigen::Vector3f pose_dif;
     pose_dif(0) = delta_t * this->v * cos((float)this->pose(2));
     pose_dif(1) = delta_t * this->v * sin((float)this->pose(2));
     pose_dif(2) = delta_t * this->omega;
+    // Keep orientation within range [-pi, pi)
     pose_dif(2) = fmod((float)pose_dif(2)+PI, 2*PI) - PI;
 
-    // update pose
+    // Update robot pose
     this->pose += pose_dif;
         
-    // encode movement
+    // Encode movement
     this->getWheelEncoder().encode_movement(this->v, this->omega, delta_t);
         
-    // set last update to current timestamp
+    // Set last update to current timestamp
     this->last_timestamp += delta_t;
 
 }
