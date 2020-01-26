@@ -24,7 +24,7 @@ class Area{
     
     // drawing functions
     void drawInitialScene();
-    void drawScene(int verbose = 0);
+    cv::Mat drawScene(int verbose);
     void drawPath();
     void drawRobot();
     void drawWalls();
@@ -41,6 +41,9 @@ class Area{
     
     // setter functions
     void setRobot(Robot robot){ this->robot = robot; };
+    
+    // print summary
+    void summary();
 
     private:
     float x_min;

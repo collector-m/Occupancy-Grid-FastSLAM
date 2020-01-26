@@ -26,16 +26,22 @@ RBPF::RBPF(){
     this->R(0) = 0.01;
     this->R(1) = 0.01;
     this->R(2) = 0.01;
+    
+    // initialize particles
+    for (int i = 0; i < this->n_particles; i++) {
+        Particle particle = Particle();
+        this->particles.push_back(particle);
+    }
 }
 
 // constructor
-RBPF::RBPF(int n_particles): scan_matcher(20, 0.001, 0.3){
+RBPF::RBPF(int n_particles, Eigen::Vector3f R, int max_iterations, float tolerance, float discard_fraction): scan_matcher(max_iterations, tolerance, discard_fraction){
     
     // set member variables
     this->n_particles = n_particles;
-    this->R(0) = 0.01;
-    this->R(1) = 0.01;
-    this->R(2) = 0.01;
+    this->R(0) = R(0);
+    this->R(1) = R(1);
+    this->R(2) = R(2);
     
     // initialize particles
     for (int i = 0; i < this->n_particles; i++) {
@@ -47,16 +53,17 @@ RBPF::RBPF(int n_particles): scan_matcher(20, 0.001, 0.3){
 // summary of RBPF
 void RBPF::summary(){
     
-    cout << "+++++++++++++++++++++++++++++++ \n";
-    cout << "RBPF Summary \n";
+    cout << "RBPF: \n";
+    cout << "-----" << endl;
     cout << "Number of Particles: " << this->n_particles << endl;
-    cout << "+++++++++++++++++++++++++++++++ \n";
+    cout << "Motion Uncertainty: " << this->R(0) << "m, " << this->R(1) << "m, " << this->R(2) << "rad" << endl;
+    this->getScanMatcher().summary();
     
 }
 
 
 // get current best map estimate
-const cv::Mat& RBPF::getMap(){
+Map& RBPF::getMap(){
     
 
     Particle* best_particle_ptr = 0;
@@ -69,36 +76,45 @@ const cv::Mat& RBPF::getMap(){
             best_particle_ptr = &(*it);
         }
     }
-    return best_particle_ptr->getMap().getData();
+    return best_particle_ptr->getMap();
     
 }
 
 
 // run filter
-void RBPF::run(Robot& robot){
+void RBPF::run(Robot& robot, const int simulation_mode){
     
-    cout << "+++++++++++++++++++++++++" << endl;
-    // cout << "Robot: " << endl;
-    // cout << robot.getPose() << endl;
+    // for localization and SLAM, update particle poses
+    if (simulation_mode == 0 || simulation_mode == 2){
+        
+        // run RBPF prediction
+        this->predict(robot.getV(), robot.getOmega(), robot.getTimestamp());
+        
+        // get RBPF sensor estimate
+        this->sweep_estimate(robot.getSensor(), robot.getPose());
+            
+        // run scan matching
+        this->scan_matching(robot.getPose(), robot.getSensor());
+        
+        // weight particles
+        this->weight(robot.getSensor());
+        
+        // resample particles
+        this->resample();
+        
+    }
+    // for mapping, set particle poses to current robot pose
+    else {
+        
+        for (list<Particle>::iterator it = this->particles.begin(); it != this->particles.end(); it++) {
+            (*it).getPose() = robot.getPose();
+        }
+    }
     
-    // run RBPF prediction
-    this->predict(robot.getV(), robot.getOmega(), robot.getTimestamp());
-    
-    // get RBPF sensor estimate
-    this->sweep_estimate(robot.getSensor(), robot.getPose());
-    
-    // run scan matching
-    this->scan_matching(robot.getPose(), robot.getSensor());
-    
-    // weight particles
-    this->weight(robot.getSensor());
-    
-    // resample particles
-    this->resample();
-    
-    cout << "+++++++++++++++++++++++++" << endl;
-
-    
+    // for mapping and SLAM, construct map from current sensor readings
+    if (simulation_mode == 1 || simulation_mode == 2){
+        this->mapping(robot.getSensor());
+    }
 }
 
 
@@ -122,9 +138,9 @@ void RBPF::predict(const float &v, const float &omega, const float& current_time
         (*it).getPose() += pose_dif;
         
         // apply uncorrelated noise
-        //(*it).getPose()(0) += (this->R(0) * distribution(generator));
-        //(*it).getPose()(1) += (this->R(1) * distribution(generator));
-        //(*it).getPose()(2) += (this->R(2) * distribution(generator));
+        (*it).getPose()(0) += (this->R(0) * distribution(generator));
+        (*it).getPose()(1) += (this->R(1) * distribution(generator));
+        (*it).getPose()(2) += (this->R(2) * distribution(generator));
         (*it).getPose()(2) = fmod((float)(*it).getPose()(2)+PI, 2*PI) - PI;
         
         // cout << "Particle " << (*it).getID() << endl;
@@ -138,16 +154,16 @@ void RBPF::predict(const float &v, const float &omega, const float& current_time
 
 
 // occupancy grid mapping
-void RBPF::mapping(Sensor &sensor, const Eigen::Array3f &pose){
-    
-    // transform robot pose from world coordinates to map coordinates
-    Eigen::Array3f map_pose = Map::world2map(pose);
+void RBPF::mapping(Sensor &sensor){
    
     // transform the sensor's maximum range to map scale
     int map_range = Map::world2map(sensor.getRange());
     
     // iterate over all particles
     for (list<Particle>::iterator it = this->particles.begin(); it != this->particles.end(); it++) {
+        
+        // transform particle pose from world coordinates to map coordinates
+        Eigen::Array3f map_pose = Map::world2map((*it).getPose());
         
         // get a reference to the currently inspected particle's map data
         cv::Mat map_ref = (*it).getMap().getData();
@@ -179,9 +195,6 @@ void RBPF::mapping(Sensor &sensor, const Eigen::Array3f &pose){
                 }
             }
         }
-        
-        // show map
-        (*it).getMap().show();
     }
 }
 
@@ -455,8 +468,8 @@ void RBPF::resample(){
     vector<Eigen::Array3f> poses;
     float sum = 0;
     for (list<Particle>::iterator it = this->particles.begin(); it != this->particles.end(); it++) {
-        cum_sum.push_back(sum);
         sum += (float)(*it).getWeight();
+        cum_sum.push_back(sum);
         poses.push_back((*it).getPose());
     }
     

@@ -223,3 +223,14 @@ Eigen::Array3f ScanMatcher::ICP(Eigen::MatrixX2f &measurement_estimate, Eigen::M
     return pose_dif;
     
 }
+
+
+void ScanMatcher::summary(){
+    
+    cout << "Scan Matcher: " << endl;
+    cout << "------------" << endl;
+    cout << "Max Iterations: " << this->max_iterations << endl;
+    cout << "Discard Fraction: " << this->discard_fraction << endl;
+    cout << "Tolerance: " << this->tolerance << endl;
+
+}

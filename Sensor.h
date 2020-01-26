@@ -30,7 +30,7 @@ class Sensor {
         const int& getRange(){ return this->range; };
         const int& getN(){ return this->n_measurements; };
         const int& getFoV(){ return this->FoV; };
-        const Eigen::Matrix2f& getQ(){ return this->Q; };
+        const Eigen::Vector2f& getQ(){ return this->Q; };
 
         // compute sensor sweep
         void sweep(const vector<vector<float>>& map_coordinates, const Eigen::Array3f& pose);
@@ -41,7 +41,7 @@ class Sensor {
         float resolution; // sensor's resolution in beams/degree
         int n_measurements; // number of measurements obtained per sweep
         Eigen::MatrixX2f measurements; // array of measurement values
-        Eigen::Matrix2f Q;
+        Eigen::Vector2f Q;
     
 };
 

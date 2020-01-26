@@ -49,17 +49,13 @@ Robot::Robot(Eigen::Vector3f initial_pose) {
 
 void Robot::summary(){
     
-    cout << "+++++++++++++++++++++++++++++++ \n";
-    cout << "Robot Summary \n";
+    cout << "Robot: \n";
+    cout << "------ \n";
     cout << "Radius: " << this->radius << "m \n";
-    cout << "Pose: x: " << this->pose(0) << " | y: " << this->pose(1) << " | theta: " << this->pose(2) <<"\n";
-    cout << "Sensor: \n";
+    cout << "Pose: x: " << this->pose(0) << "m | y: " << this->pose(1) << "m | theta: " << this->pose(2) << "rad" << "\n";
     this->sensor.summary();
-    cout << "RBPF: \n";
     this->filter.summary();
-    cout << "Last Update: " << this->last_timestamp << "s" << endl;
-    cout << "+++++++++++++++++++++++++++++++ \n";
-    
+
 }
 
 

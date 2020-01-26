@@ -15,6 +15,7 @@
 #include "Particle.h"
 #include "Sensor.h"
 #include "ScanMatcher.h"
+#include "Map.h"
 
 class Robot;
 
@@ -25,7 +26,7 @@ class RBPF {
     public:
     // constructor and destructor
     RBPF();
-    RBPF(int n_particles);
+    RBPF(int n_particles, Eigen::Vector3f R, int max_iterations, float tolerance, float discard_fraction);
     ~RBPF(){};
     
     // summary of RBPF
@@ -34,17 +35,18 @@ class RBPF {
     // functionality of the particle filter
     void predict(const float& v, const float& omega, const float& current_timestamp);
     void sweep_estimate(Sensor& sensor, const Eigen::Array3f& pose);
-    void mapping(Sensor& sensor, const Eigen::Array3f& pose);
-    void run(Robot &robot);
+    void mapping(Sensor& sensor);
+    void run(Robot &robot, const int simulation_mode);
     int inverse_sensor_model(const int& x, const int& y, Eigen::Array3f& image_pose, Sensor& sensor);
     void scan_matching(const Eigen::Array3f &pose, Sensor& sensor);
     void weight(Sensor& sensor);
     void resample();
     
     // getter functions
-    const cv::Mat& getMap();
+    Map& getMap();
     list<Particle>& getParticles(){ return this->particles; };
     const int getN(){ return this->n_particles; };
+    ScanMatcher getScanMatcher(){ return this->scan_matcher; };
     
     // setter functions
     void setScanMatcher(ScanMatcher scan_matcher){ this->scan_matcher = scan_matcher; };

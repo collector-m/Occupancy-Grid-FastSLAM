@@ -12,6 +12,7 @@
 
 #define PI 3.14159265
 
+class Map;
 
 // standard constructor
 Area::Area(){
@@ -76,9 +77,6 @@ void Area::drawInitialScene(){
         // draw robot
         this->drawRobot();
         
-        // draw particles
-        this->drawParticles();
-        
         cv::imshow("Area", this->data);
         cv::waitKey();
         
@@ -88,61 +86,43 @@ void Area::drawInitialScene(){
 }
 
 
-
-void Area::drawScene(int verbose){
-    
-    if (verbose == 0) {
+cv::Mat Area::drawScene(int verbose){
         
         // draw robot path
         this->drawPath();
-        
+            
         // create a copy to restore original image
         cv::Mat data_copy;
         this->data.copyTo(data_copy);
-        
-        // draw robot
-        this->drawRobot();
-        
-        // draw particles
-        this->drawParticles();
-        
-        cv::imshow("Area", this->data);
-        cv::waitKey(1);
-        
-        // restore original image
-        this->data = data_copy;
-        
-    }
-    else {
-        
-        // draw robot path
-        this->drawPath();
-        
-        // create a copy to restore original image
-        cv::Mat data_copy;
-        this->data.copyTo(data_copy);
-        
+            
         // draw sensor readings
         this->drawScan();
         
         // draw scan estimate
+        if (verbose == 2){
         this->drawScanEstimate();
-        
+        }
+            
         // draw robot
         this->drawRobot();
-    
-        // draw particles
-        this->drawParticles();
         
+        // draw particles
+        if (verbose >= 1){
+        this->drawParticles();
+        }
+    
+        // create copy of scene for saving
+        cv::Mat data_save;
+        this->data.copyTo(data_save);
+
         cv::imshow("Area", this->data);
         cv::waitKey(1);
-        
+    
         // restore original image
         this->data = data_copy;
-    }
     
-    
-    
+        return data_save;
+
 }
 
 
@@ -336,4 +316,15 @@ int Area::scale_world_variable(const float& world_variable){
     area_variable = (int)(world_variable / this->resolution);
     return area_variable;
     
+}
+
+void Area::summary(){
+    
+    cout << "Area: " << endl;
+    cout << "-----" << endl;
+    cout << "Width: " << this->x_max - this->x_min << "m" << endl;
+    cout << "Height: " << this->y_max - this->y_min << "m" << endl;
+    Map::summary();
+    this->getRobot().summary();
+
 }

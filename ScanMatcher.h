@@ -31,6 +31,9 @@ class ScanMatcher {
     Eigen::Matrix3f fit_transform(const Eigen::MatrixX2f &A, const Eigen::MatrixX2f &B);
     nn_result nearest_neighbor(const Eigen::MatrixX2f &A, const Eigen::MatrixX2f &B);
     
+    // summary
+    void summary();
+    
     private:
     int max_iterations;
     float tolerance;

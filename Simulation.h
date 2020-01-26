@@ -25,6 +25,13 @@ typedef struct {
     float value;
 } Parameter;
 
+// struct to store save options
+typedef struct {
+    bool save;
+    int save_frequency;
+    string result_dir;
+} SaveOptions;
+
 // enum for reading in relevant simulation parameters
 enum parameter_id{
     xmin,
@@ -76,12 +83,19 @@ const string parameter_names []{
     "discard_fraction",
 };
 
+// simulation modes
+const string simulation_modes [] {
+    "Localization",
+    "Mapping",
+    "SLAM",
+};
+
 
 class Simulation {
     
     public:
         // constructor and destructor
-        Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename);
+        Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, int simulation_mode, int verbose, SaveOptions save_options);
         ~Simulation(){};
     
         // read-in functions
@@ -98,11 +112,27 @@ class Simulation {
     
         // run simulation
         void run();
+    
+        // print summary
+        void summary();
+    
+        // save results
+        void save_scene(cv::Mat scene_data);
+        void save_map(cv::Mat map_data);
 
     private:
         ////////////////////////////
         // simulation parameters //
         ///////////////////////////
+    
+        // Simulation mode
+        int simulation_mode;
+    
+        // Verbose level
+        int verbose;
+    
+        // Save options
+        SaveOptions save_options;
     
         // Sensor parameters
         int FoV;

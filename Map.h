@@ -20,10 +20,10 @@ class Map{
         ~Map(){};
     
         // print summary of map
-        void summary();
+        static void summary();
     
         // display map using cv::imshow
-        void show();
+        cv::Mat draw();
     
         // static getter functions
         static const float& getWidth(){ return Map::width; };
@@ -61,6 +61,7 @@ class Map{
         const static int occupancy_value_max;
         const static int occupancy_value_min;
         const static int occupancy_value_step;
+        const static int occupancy_value_init;
     
         // map data
         cv::Mat data;

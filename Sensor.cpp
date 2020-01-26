@@ -25,7 +25,8 @@ Sensor::Sensor(){
     this->range = 10;
     this->resolution = 1;
     this->n_measurements = (int)((FoV/resolution) + 1);
-    this->Q = Eigen::Matrix2f::Identity(2, 2) * 0.1;
+    this->Q(0) = 0.1;
+    this->Q(1) = 0.1;
     this->measurements = Eigen::MatrixX2f::Zero(this->n_measurements, 2);
     
 }
@@ -38,9 +39,9 @@ Sensor::Sensor(int FoV, int range, float resolution){
     this->range = range;
     this->resolution = resolution;
     this->n_measurements = (int)((FoV/resolution) + 1);
-    this->Q = Eigen::Matrix2f::Identity(2, 2) * 0.1;
+    this->Q(0) = 0.1;
+    this->Q(1) = 0.1;
     this->measurements = Eigen::MatrixX2f::Zero(this->n_measurements, 2);
-
     
 }
 
@@ -48,14 +49,13 @@ Sensor::Sensor(int FoV, int range, float resolution){
 // summary of sensor
 void Sensor::summary(){
     
-    cout << "+++++++++++++++++++++++++++++++ \n";
-    cout << "Sensor Summary \n";
+    cout << "Sensor: \n";
+    cout << "-------" << endl;
     cout << "FoV: " << this->FoV << "° \n";
     cout << "Range: " << this->range << "m \n";
     cout << "Resolution: " << this->resolution << "° \n";
     cout << "Number of Measurements: " << this->n_measurements << endl;
-    cout << "+++++++++++++++++++++++++++++++ \n";
-    
+    cout << "Sensor Uncertainty: " << this->Q(0) << "m, " << this->Q(1) << "rad" << endl;
 }
 
 

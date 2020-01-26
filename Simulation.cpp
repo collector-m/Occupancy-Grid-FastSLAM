@@ -10,6 +10,7 @@
 #include <iostream>
 #include <math.h>
 #include <fstream>
+#include <filesystem>
 
 #include "Simulation.h"
 #include "Sensor.h"
@@ -266,11 +267,25 @@ void Simulation::read_control_signal_file() {
 // Constructor //
 /////////////////
 
-Simulation::Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename){
+Simulation::Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, int simulation_mode, int verbose, SaveOptions save_options){
     
     //////////////////////////
     // read-in information //
     /////////////////////////
+    
+    // set simulation mode
+    this->simulation_mode = simulation_mode;
+    
+    // set verbose level
+    if (simulation_mode == 1 && verbose > 0){verbose = 0;} // set verbose to 0 in mapping mode
+    this->verbose = verbose;
+    
+    // set save options
+    this->save_options = save_options;
+    bool result_dir_exists = std::__fs::filesystem::exists(save_options.result_dir);
+     if (save_options.save == true && result_dir_exists == false){
+         std::__fs::filesystem::create_directory(save_options.result_dir);
+     }
     
     // set filename variables
     this->wall_filename = wall_filename;
@@ -293,8 +308,19 @@ Simulation::Simulation(const string& wall_filename, const string& parameter_file
     // create area
     this->area = Area(wall_coordinates, x_min, x_max, y_min, y_max, resolution);
 
-    // create robot and place robot in area
+    // create all required robot components
+    if (this->simulation_mode == 1){this->n_particles = 1;}  // set n_particles to 1 in mapping mode
+    RBPF filter = RBPF(n_particles, R, max_iterations, tolerance, discard_fraction);
+    Sensor sensor = Sensor(FoV, range, sensor_resolution);
+    
+    // create robot
     Robot robot = Robot();
+    
+    // set robot components
+    robot.setFilter(filter);
+    robot.setSensor(sensor);
+    
+    // place robot in area
     this->area.setRobot(robot);
     
     ////////////////////////////
@@ -304,6 +330,9 @@ Simulation::Simulation(const string& wall_filename, const string& parameter_file
     // set time variables
     this->start_time = 0.0; // start time of the simulation
     this->end_time = this->control_signals.size() * this->sampling_time + this->start_time; // end time of the simulation computed from number of read-in control signals and specified sampling time
+    
+    // print simulation summary
+    this->summary();
     
     // draw initial scene
     this->area.drawInitialScene();
@@ -331,12 +360,94 @@ void Simulation::run(){
         
         // drive robot
         robot.drive(this->sampling_time);
-
-        // draw simulation
-        this->area.drawScene();
+        
+        // sensor sweep
+        robot.getSensor().sweep(this->wall_coordinates, robot.getPose());
+        
+        // run particle filter
+        robot.getFilter().run(robot, this->simulation_mode);
         
         // set current simulation time
         this->simulation_time += this->sampling_time;
         
+        // draw simulation
+        cv::Mat scene_data = this->area.drawScene(this->verbose);
+        cv::Mat map_data = this->getArea().getRobot().getFilter().getMap().draw();
+        
+        // save results
+        // set frequency trigger based on current iteration
+        bool frequency_trigger;
+        int current_iteration = (int) ((this->simulation_time +
+                                        this->sampling_time/2) / this->sampling_time);
+        // if save frequency is 0, only save results at last timestep
+        if (save_options.save_frequency == 0){
+            if (it == this->control_signals.end()){
+                frequency_trigger = true;}
+            else {
+                frequency_trigger = false;}
+        }
+        // if frequency > 0, trigger result saving according to specified frequency
+        else {
+            frequency_trigger = (bool) ((current_iteration % save_options.save_frequency) == 0);}
+
+        // save scene image in all modes and map in Mapping and SLAM mode
+        if (save_options.save == true && frequency_trigger == true){
+            this->save_scene(scene_data);
+            if (this->simulation_mode == 1 || this->simulation_mode == 2){
+                this->save_map(map_data);
+            }
+        }
     }
+}
+
+
+// print simulation summary
+void Simulation::summary(){
+    
+    cout << "Simulation Summary \n";
+    cout << "++++++++++++++++++ \n";
+    cout << "Mode: " << simulation_modes[this->simulation_mode] << "\n";
+    cout << "Verbosity: " << this->verbose << endl;
+    this->getArea().summary();
+    cout << "++++++++++++++++++ \n";
+}
+
+
+// save scene image to file
+void Simulation::save_scene(cv::Mat scene_data){
+    
+    // check if "Scenes" directory exists and create if not
+    string scenes_dir = "Scenes";
+    bool scene_dir_exists = std::__fs::filesystem::exists(save_options.result_dir + "/" + scenes_dir);
+    if (scene_dir_exists == false){
+        std::__fs::filesystem::create_directory(save_options.result_dir + "/" + scenes_dir);
+    }
+    
+    // compute current iteration as image index
+    int current_iteration = (int) ((this->simulation_time + this->sampling_time/2) / this->sampling_time);
+    
+    // save scene image in specified directory
+    string file_name = "scene_" + to_string(current_iteration) + ".png";
+    string file_path = this->save_options.result_dir + "/" + scenes_dir + "/" + file_name;
+    cv::imwrite(file_path, scene_data);
+}
+
+
+// save map image to file
+void Simulation::save_map(cv::Mat map_data){
+    
+    // check if "Maps" directory exists and create if not
+    string maps_dir = "Maps";
+    bool scene_dir_exists = std::__fs::filesystem::exists(save_options.result_dir + "/" + maps_dir);
+    if (scene_dir_exists == false){
+        std::__fs::filesystem::create_directory(save_options.result_dir + "/" + maps_dir);
+    }
+    
+    // compute current iteration as image index
+    int current_iteration = (int) ((this->simulation_time + this->sampling_time/2) / this->sampling_time);
+    
+    // save map image in specified directory
+    string file_name = "map_" + to_string(current_iteration) + ".png";
+    string file_path = this->save_options.result_dir + "/" + maps_dir + "/" + file_name;
+    cv::imwrite(file_path, map_data);
 }

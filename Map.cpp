@@ -29,14 +29,15 @@ const float Map::y_max = 25; // max y coordinate of map in m
 const int Map::occupancy_value_min = 0;
 const int Map::occupancy_value_max = 255;
 const int Map::occupancy_value_step = 25;
+const int Map::occupancy_value_init = 127;
 
 
 // constructor
 Map::Map(){
     
     // set member variables
-    this->data = cv::imread("map.jpg", CV_8UC1);
-    //this->data = cv::Mat((int)width/resolution, (int)height/resolution, CV_8UC1, cv::Scalar::all(127));
+    //this->data = cv::imread("Data/map.jpg", CV_8UC1);
+    this->data = cv::Mat((int)width/resolution, (int)height/resolution, CV_8UC1, cv::Scalar::all(127));
     
 }
 
@@ -44,29 +45,24 @@ Map::Map(){
 // summary function
 void Map::summary(){
     
-    cout << "+++++++++++++++++++++++++++++++ \n";
-    cout << "Map Summary \n";
-    cout << "Width: " << Map::width << "m \n";
-    cout << "Height: " << Map::height << "m \n";
-    cout << "x_min: " << Map::x_min << "m \n";
-    cout << "x_max: " << Map::x_max << "m \n";
-    cout << "y_min: " << Map::y_min << "m \n";
-    cout << "y_max: " << Map::y_max << "m \n";
+    cout << "Map: \n";
+    cout << "----" << endl;
     cout << "Resolution: " << Map::resolution << "m/px \n";
-    cout << "value_min: " << Map::occupancy_value_min << "m/px \n";
-    cout << "value_max: " << Map::occupancy_value_max << "m/px \n";
-    cout << "value_step: " << Map::occupancy_value_step << "m/px \n";
-    cout << "+++++++++++++++++++++++++++++++ \n";
+    cout << "value_min: " << Map::occupancy_value_min << endl;
+    cout << "value_max: " << Map::occupancy_value_max << endl;
+    cout << "value_step: " << Map::occupancy_value_step << endl;
     
 }
 
 
 // display map using cv::imshow
-void Map::show(){
+cv::Mat Map::draw(){
     
     cv::namedWindow("Map", cv::WINDOW_AUTOSIZE);
     cv::imshow("Map", this->data);
     cv::waitKey(1);
+    
+    return this->data;
     
 }
 
