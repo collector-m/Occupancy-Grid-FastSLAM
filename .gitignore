@@ -1,3 +1,4 @@
 **/Occupancy-Grid-FastSLAM.entitlements
 **/Occupancy-Grid-FastSLAM.xcodeproj
 **.DS_Store
+**/Results
