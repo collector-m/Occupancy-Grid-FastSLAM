@@ -80,7 +80,7 @@ void Robot::drive(const float &delta_t){
     this->pose += pose_dif;
         
     // Encode movement
-    this->getWheelEncoder().encode_movement(this->v, this->omega, delta_t);
+    this->getWheelEncoder().encode_motion(this->v, this->omega, delta_t);
         
     // Set last update to current timestamp
     this->last_timestamp += delta_t;

@@ -16,7 +16,7 @@ class WheelEncoder {
     public:
         WheelEncoder();
         ~WheelEncoder(){};
-        void encode_movement(float v, float omega, const float& delta_t);
+        void encode_motion(float v, float omega, const float& delta_t);
         Eigen::Vector2f getOdometry(float current_timestamp);
     
     private:
@@ -31,7 +31,6 @@ class WheelEncoder {
         int ticks_left_prev; // accumulated ticks of left wheel at last timestamp
         int ticks_right_prev; // accumulated ticks of right wheel at last timestamp
 
-    
 };
 
 #endif /* WheelEncoder_h */
