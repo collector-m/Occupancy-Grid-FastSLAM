@@ -19,20 +19,20 @@
 
 using namespace std;
 
-// struct to store parameter values from text file
+// Struct to store parameter values from text file
 typedef struct {
     string name;
     float value;
 } Parameter;
 
-// struct to store save options
+// Struct to store save options
 typedef struct {
     bool save;
     int save_frequency;
     string result_dir;
 } SaveOptions;
 
-// enum for reading in relevant simulation parameters
+// Enum for reading in relevant simulation parameters
 enum parameter_id{
     xmin,
     xmax,
@@ -58,7 +58,7 @@ enum parameter_id{
     Error
 };
 
-// string names of relevant simulation parameters
+// String names of relevant simulation parameters
 const string parameter_names []{
     "x_min",
     "x_max",
@@ -83,7 +83,7 @@ const string parameter_names []{
     "discard_fraction",
 };
 
-// simulation modes
+// String names of simulation modes
 const string simulation_modes [] {
     "Localization",
     "Mapping",
@@ -94,41 +94,38 @@ const string simulation_modes [] {
 class Simulation {
     
     public:
-        // constructor and destructor
-        Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, int simulation_mode, int verbose, SaveOptions save_options);
+        // Constructor and destructor
+        Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, const int simulation_mode, int verbose, SaveOptions save_options);
         ~Simulation(){};
     
-        // read-in functions
+        // Read-in functions
         void read_wall_file();
         void read_parameter_file();
         void read_control_signal_file();
     
-        // set simulation parameters
+        // Set simulation parameters
         void setParamters();
 
-        // getter functions
+        // Getter functions
         Area& getArea(){ return this->area; };
         const vector<vector<float>>& getWallCoordinates(){ return this->wall_coordinates; };
     
-        // run simulation
+        // Run simulation
         void run();
     
-        // print summary
+        // Print summary
         void summary();
     
-        // save results
-        void save_scene(cv::Mat scene_data);
-        void save_map(cv::Mat map_data);
+        // Save results
+        void save_image(cv::Mat data, string save_dir, string name_prefix);
+        void save_results(const vector<Eigen::Vector2f>::iterator it);
 
     private:
-        ////////////////////////////
-        // simulation parameters //
-        ///////////////////////////
     
         // Simulation mode
         int simulation_mode;
     
-        // Verbose level
+        // Verbosity level
         int verbose;
     
         // Save options
@@ -138,6 +135,7 @@ class Simulation {
         int FoV;
         float range;
         float sensor_resolution;
+        Eigen::Vector2f Q;
     
         // Filter parameters
         int n_particles;
@@ -155,16 +153,16 @@ class Simulation {
         float y_max;
         float resolution;
     
-        // simulation time
+        // Simulation time
         float start_time;
         float sampling_time;
         float end_time;
         float simulation_time;
     
-        // area
+        // Area
         Area area;
     
-        // read-in filenames and contents
+        // Read-in filenames and contents
         string wall_filename;  // txt file specifying wall coordinates
         string parameter_filename;  // txt file specifying all simulation parameters
         string control_signal_filename; // txt file specifying all control signals
