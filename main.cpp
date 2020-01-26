@@ -22,26 +22,31 @@ using namespace cv;
 int main(int argc, const char * argv[]) {
     
     
-    // set simulation mode | 0 = Localization, 1 = Mapping, 2 = SLAM
-    int simulation_mode = 1;
+    // Set simulation mode | 0 = Localization, 1 = Mapping, 2 = SLAM
+    int simulation_mode = 2;
     
-    // set verbosity level
+    // Set verbosity level
     int verbose = 2;
     
-    // set save options
+    // Set save options
     SaveOptions save_options;
     save_options.save = true;
-    save_options.save_frequency = 10;
+    save_options.save_frequency = 0;  // frequency = 0 -> only save results at last timestep
     save_options.result_dir = "Results";
     
-    // create simulation
-    Simulation *simulation = new Simulation("Data/walls.txt", "Data/parameters.txt",
-                                            "Data/control_signals.txt", simulation_mode, verbose, save_options);
+    // Create simulation
+    string data_dir = "Data";
+    string walls_file_path = data_dir + "/" + "walls.txt";
+    string parameters_file_path = data_dir + "/" + "parameters.txt";
+    string control_signals_file_path = data_dir + "/" + "control_signals.txt";
+    Simulation *simulation = new Simulation(walls_file_path, parameters_file_path,
+                                            control_signals_file_path, simulation_mode, verbose, save_options);
     
-    // run simulation
+    // Run simulation
     simulation->run();
     
+    // Wait for keypress to close window
     cv::waitKey();
-
+    
     return 0;
 }
