@@ -17,23 +17,23 @@ using namespace std;
 class Sensor {
     
     public:
-        // constructor and destructor
+        // Constructor and destructor
         Sensor();
-        Sensor(int FoV, int range, float resolution);
+        Sensor(int FoV, int range, float resolution, Eigen::Vector2f Q);
         ~Sensor(){};
     
-        // print summary of sensor
+        // Print sensor summary
         void summary();
 
-        // getter functions
+        // Getter functions
         Eigen::MatrixX2f& getMeasurements(){ return this->measurements; };
         const int& getRange(){ return this->range; };
         const int& getN(){ return this->n_measurements; };
         const int& getFoV(){ return this->FoV; };
         const Eigen::Vector2f& getQ(){ return this->Q; };
 
-        // compute sensor sweep
-        void sweep(const vector<vector<float>>& map_coordinates, const Eigen::Array3f& pose);
+        // Compute sensor sweep
+        void sweep(const vector<vector<float>>& map_coordinates, const Eigen::Vector3f& pose);
     
     private:
         int FoV; // sensor's field of view in degree
@@ -41,7 +41,7 @@ class Sensor {
         float resolution; // sensor's resolution in beams/degree
         int n_measurements; // number of measurements obtained per sweep
         Eigen::MatrixX2f measurements; // array of measurement values
-        Eigen::Vector2f Q;
+        Eigen::Vector2f Q; // standard deviation of gaussian measurement noise
     
 };
 
