@@ -79,8 +79,8 @@ Eigen::Vector2f WheelEncoder::getOdometry(float current_timestamp){
     int delta_ticks_right = this->ticks_right - this->ticks_right_prev;
     
     // Compute v and omega from encoder ticks
-    float omega_r = 2 * PI * delta_ticks_left / (this->E_T * delta_t);
-    float omega_l = 2 * PI * delta_ticks_right / (this->E_T * delta_t);
+    float omega_r = 2 * PI * delta_ticks_right / (this->E_T * delta_t);
+    float omega_l = 2 * PI * delta_ticks_left / (this->E_T * delta_t);
     float omega = (omega_r * this->R_R - omega_l * this->R_L) / this->B;
     float v = (omega_r * R_R + omega_l * this->R_L) / 2;
     

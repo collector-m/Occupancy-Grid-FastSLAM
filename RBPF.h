@@ -36,7 +36,7 @@ class RBPF {
         void predict(const float& v, const float& omega, const float& current_timestamp);
         void sweep_estimate(Sensor& sensor);
         void mapping(Sensor& sensor);
-        void run(Robot &robot, const int simulation_mode);
+        void run(Robot &robot, Eigen::Vector2f odometry_signal, const int simulation_mode);
         int inverse_sensor_model(const int& x, const int& y, Eigen::Vector3f& image_pose, Sensor& sensor);
         void scan_matching(const Eigen::Vector3f &pose, Sensor& sensor);
         void weight(Sensor& sensor);

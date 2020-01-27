@@ -74,13 +74,15 @@ void RBPF::summary(){
 // ++++++++++++++++++++++++++++++++++++++++++++++ Run filter +++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void RBPF::run(Robot& robot, const int simulation_mode){
+void RBPF::run(Robot& robot, Eigen::Vector2f odometry_signal, const int simulation_mode){
     
     // For localization and SLAM update particle poses
     if (simulation_mode == 0 || simulation_mode == 2){
         
         // Compute prediction based on odometry information and motion model
-        this->predict(robot.getV(), robot.getOmega(), robot.getTimestamp());
+        float v_hat = odometry_signal(0); // Estimated translational velocity from wheel encoder
+        float omega_hat = odometry_signal(1); // Estimated angular velocity from wheel encoder
+        this->predict(v_hat, omega_hat, robot.getTimestamp());
         
         // Get sensor scan estimate
         this->sweep_estimate(robot.getSensor());

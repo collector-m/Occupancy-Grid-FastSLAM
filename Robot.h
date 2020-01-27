@@ -29,7 +29,7 @@ class Robot {
         void summary();
     
         // Drive robot
-        void drive(const float& delta_t);
+        Eigen::Vector2f drive(const float& delta_t);
     
         // Getter functions
         Eigen::Vector3f& getPose(){ return this->pose; };

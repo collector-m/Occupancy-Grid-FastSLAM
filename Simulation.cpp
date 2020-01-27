@@ -399,13 +399,13 @@ void Simulation::run(){
         robot.setOmega((*it)(1));
         
         // Drive robot
-        robot.drive(this->sampling_time);
+        Eigen::Vector2f odometry_signal = robot.drive(this->sampling_time);
         
         // Sensor sweep
         robot.getSensor().sweep(this->wall_coordinates, robot.getPose());
         
         // Run particle filter
-        robot.getFilter().run(robot, this->simulation_mode);
+        robot.getFilter().run(robot, odometry_signal, this->simulation_mode);
         
         // Set current simulation time
         this->simulation_time += this->sampling_time;

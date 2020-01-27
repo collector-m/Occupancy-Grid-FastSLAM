@@ -66,7 +66,7 @@ void Robot::summary(){
 // ++++++++++++++++++++++++++++++++++++++++++++++ Drive robot ++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void Robot::drive(const float &delta_t){
+Eigen::Vector2f Robot::drive(const float &delta_t){
         
     // Pose difference due to constant control signal applied over period of delta_t
     Eigen::Vector3f pose_dif;
@@ -84,6 +84,11 @@ void Robot::drive(const float &delta_t){
         
     // Set last update to current timestamp
     this->last_timestamp += delta_t;
+    
+    // Get odometry information
+    Eigen::Vector2f odometry_signal = this->getWheelEncoder().getOdometry(this->last_timestamp);
+    
+    return odometry_signal;
 
 }
 
