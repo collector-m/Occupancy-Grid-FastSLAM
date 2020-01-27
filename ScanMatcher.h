@@ -18,27 +18,27 @@ typedef struct {
     vector<int> indices;
 } nn_result;
 
+
 class ScanMatcher {
     
     public:
-    // constructor and destructor
-    ScanMatcher();
-    ScanMatcher(int max_iterations, float tolerance, float discard_fraction);
-    ~ScanMatcher(){};
-    
-    // perform ICP
-    Eigen::Array3f ICP(Eigen::MatrixX2f &A, Eigen::MatrixX2f &B);
-    Eigen::Matrix3f fit_transform(const Eigen::MatrixX2f &A, const Eigen::MatrixX2f &B);
-    nn_result nearest_neighbor(const Eigen::MatrixX2f &A, const Eigen::MatrixX2f &B);
-    
-    // summary
-    void summary();
-    
+        // Constructor and destructor
+        ScanMatcher();
+        ScanMatcher(int max_iterations, float tolerance, float discard_fraction);
+        ~ScanMatcher(){};
+        
+        // Perform ICP
+        Eigen::Vector3f ICP(Eigen::MatrixX2f &A, Eigen::MatrixX2f &B, const Eigen::Vector3f R);
+        Eigen::Matrix3f fit_transform(const Eigen::MatrixX2f &A, const Eigen::MatrixX2f &B);
+        nn_result nearest_neighbor(const Eigen::MatrixX2f &A, const Eigen::MatrixX2f &B);
+        
+        // Print scan matcher summary
+        void summary();
+        
     private:
-    int max_iterations;
-    float tolerance;
-    float discard_fraction;
-    
+        int max_iterations;
+        float tolerance;
+        float discard_fraction;
     
 };
 
