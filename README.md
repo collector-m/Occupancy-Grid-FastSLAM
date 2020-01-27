@@ -30,7 +30,7 @@ The rest of this readme is structured as follows. In [Section 2](#implementation
 
 ## Implementation Details
 
-The multi-purpose control framework presented in this repository consists of four main components. These components are intended to make the implementation as modular as possible, facilitating extensions to certain components without having to alter the overall structure of the framework. An illustration of the components and their interaction is displayed below.
+The project is based on object-oriented design principles and aims to provide and relate class implementations according to the functionality of the corresponding physical components. An illustration of the high-level architecture and the flow of information between the main components is displayed below.
 
 <p align="center">
 <img src="Images/MPC_Framework.png">
@@ -38,9 +38,11 @@ The multi-purpose control framework presented in this repository consists of fou
 
 ### Robot 
 
-The Map class is a handler for the Occupancy Grid Map of the environment. The map is represented as a binary array classifying each cell as either free or occupied. Moreover, the Map class can act as a wrapper around a potential obstacle detection algorithm. By incorporating e.g. LiDAR measurements and updating the Occupancy Grid Map accordingly, new information about the drivable area can be passed to the Reference Path object.
+The robot class serves as an abstraction for most of the computations as it takes all of the components a real-world robot would have as member variables. This includes the sensor, the particle filter and the wheel encoder. This nested structure allows to only expose relevant information, in this case the current robot pose, to the rest of the program. The robot class further provides a '''drive()''' function in order to simulate the robot motion.
 
 ### Rao Blackwellized Particle Filter
+
+The particle filter object implements all functions required for the localization of the robot and the mapping of the environment. This includes the conventional functionality of 
 
 #### Particles
 
