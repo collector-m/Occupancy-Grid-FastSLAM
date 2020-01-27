@@ -10,23 +10,24 @@ y_max = 25
 area_resolution = 0.02 # in m/px
 
 # Map #
-map_resolution = 0.1 # resolution in m/px
+map_resolution = 0.05 # resolution in m/px
 occupancy_value_min = 0;
 occupancy_value_max = 255;
 occupancy_value_step = 25;
+occupancy_threshold = 127;
 
 # Filter #
 n_particles = 5 # number of Particles
-R_x = 0.01 # motion uncertainty on x position in m
-R_y = 0.01 # motion uncertainty on y position in m
+R_x = 0.03 # motion uncertainty on x position in m
+R_y = 0.03 # motion uncertainty on y position in m
 R_t = 0.01 # motion uncertainty on bearing in °
 
 # Sensor #
 FoV = 90 # FoV in °
-range = 10 # range in m
+range = 8 # range in m
 sensor_resolution = 1 # resolution in beams/°
-Q_r = 0.01 # sensor uncertainty on range in m
-Q_t = 0.01 # sensor uncertainty on angle in °
+Q_r = 0.05 # sensor uncertainty on range in m
+Q_t = 0.05 # sensor uncertainty on angle in °
 
 # Scan Matcher #
 max_iterations = 20 # maximum number of iterations
