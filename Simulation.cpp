@@ -18,7 +18,6 @@
 class Map;
 
 using namespace std;
-using namespace Eigen;
 
 #define PI 3.14159265
 
@@ -27,7 +26,7 @@ using namespace Eigen;
 // ++++++++++++++++++++++++++++++++++++++++++++ Constructor ++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Simulation::Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, const int simulation_mode, int verbose, SaveOptions save_options){
+Simulation::Simulation(const string& data_dir, const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, const int simulation_mode, int verbose, SaveOptions save_options){
     
     
     // +++++++++++++++++++++++ Set simulation parameters and read-in files +++++++++++++++++++++++++++++++++++
@@ -51,6 +50,7 @@ Simulation::Simulation(const string& wall_filename, const string& parameter_file
      }
     
     // Set filename variables
+    this->data_dir = data_dir;
     this->wall_filename = wall_filename;
     this->parameter_filename = parameter_filename;
     this->control_signal_filename = control_signal_filename;
@@ -249,6 +249,17 @@ void Simulation::setParamters(){
                 break;
             case AreaResolution: this->resolution = (float)(*it).value;
                 break;
+                // map parameters
+            case MapResolution: this->map_resolution = (float)(*it).value;
+                break;
+            case OccupancyValueMin: this->occupancy_value_min = (*it).value;
+                break;
+            case OccupancyValueMax: this->occupancy_value_max = (*it).value;
+                break;
+            case OccupancyValueStep: this->occupancy_value_step = (*it).value;
+                break;
+            case OccupancyThreshold: this->occupancy_threshold = (*it).value;
+                break;
                 // Sensor Parameters
             case FOV: this->FoV = (int)(*it).value;
                 break;
@@ -282,6 +293,9 @@ void Simulation::setParamters(){
             default: break;
         }
     }
+    
+    // Set static map parameters
+    Map::setParameters(this->x_min, this->x_max, this->y_min, this->y_max, this->map_resolution,    this->occupancy_value_min, this->occupancy_value_max, this->occupancy_value_step, this->occupancy_threshold, this->simulation_mode, this->data_dir);
 }
 
 

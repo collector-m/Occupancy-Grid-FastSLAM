@@ -43,6 +43,7 @@ enum parameter_id{
     OccupancyValueMin,
     OccupancyValueMax,
     OccupancyValueStep,
+    OccupancyThreshold,
     nParticles,
     Rx,
     Ry,
@@ -69,6 +70,7 @@ const string parameter_names []{
     "occupancy_value_min",
     "occupancy_value_max",
     "occupancy_value_step",
+    "occupancy_threshold",
     "n_particles",
     "R_x",
     "R_y",
@@ -95,7 +97,7 @@ class Simulation {
     
     public:
         // Constructor and destructor
-        Simulation(const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, const int simulation_mode, int verbose, SaveOptions save_options);
+        Simulation(const string& data_dir, const string& wall_filename, const string& parameter_filename, const string& control_signal_filename, const int simulation_mode, int verbose, SaveOptions save_options);
         ~Simulation(){};
     
         // Read-in functions
@@ -153,6 +155,13 @@ class Simulation {
         float y_max;
         float resolution;
     
+        // Map parameters
+        float map_resolution;
+        int occupancy_value_min;
+        int occupancy_value_max;
+        int occupancy_value_step;
+        int occupancy_threshold;
+    
         // Simulation time
         float start_time;
         float sampling_time;
@@ -163,6 +172,7 @@ class Simulation {
         Area area;
     
         // Read-in filenames and contents
+        string data_dir; // directory containing required data for simulation
         string wall_filename;  // txt file specifying wall coordinates
         string parameter_filename;  // txt file specifying all simulation parameters
         string control_signal_filename; // txt file specifying all control signals
