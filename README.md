@@ -24,13 +24,13 @@ In Localization mode, a ground truth map of the area is provided and the robot i
 
 The rest of this readme is structured as follows. In [Section 2](#implementation-details) we will present an overview of the project architecture and discuss all fundamental components of the implementation in detail. In [Section 3](#how-to) we will provide guidelines for using the simulator for SLAM as well as other robotics applications. [Section 4](#limitations-and-outlook) will be dedicated to analyzing limitations of the current version of the simulation environment and outline potential extensions of the implementation.
 
-## Implementation Details
-
-The project is based on object-oriented design principles and aims to provide and relate class implementations according to the functionality of the corresponding physical components. An illustration of the high-level architecture and the flow of information between the main components is displayed below.
-
 <p align="center">
 <img src="Images/Project_Architecture.png">
 </p>
+
+## Implementation Details
+
+The project is based on object-oriented design principles and aims to provide and relate class implementations according to the functionality of the corresponding physical components. An illustration of the high-level architecture and the flow of information between the main components is displayed below.
 
 ### Robot 
 
