@@ -29,7 +29,7 @@ The rest of this readme is structured as follows. In [Section 2](#implementation
 The project is based on object-oriented design principles and aims to provide and relate class implementations according to the functionality of the corresponding physical components. An illustration of the high-level architecture and the flow of information between the main components is displayed below.
 
 <p align="center">
-<img src="Images/Project_Architecture.png">
+  <img src="Images/Project_Architecture.svg" width="100%">
 </p>
 
 ### Robot 
