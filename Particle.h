@@ -31,15 +31,24 @@ class Particle{
     
         // Getter functions
         Eigen::Vector3f& getPose(){ return this->pose; };
+        Eigen::Vector3f& getLastPose(){ return this->last_pose; };
+        Eigen::Vector3f getPoseCopy(){ return this->pose; };
         Map& getMap(){ return this->map; };
-        float& getWeight(){ return this->weight; };
+        double& getWeight(){ return this->weight; };
         Eigen::MatrixX2f& getMeasurementEstimate(){ return this->measurement_estimate; };
+        vector<Eigen::Vector3f>& getSamples(){ return this->samples; };
+        vector<Eigen::MatrixX2f>& getSampleMeasurementEstimates(){ return this->sample_measurement_estimates; };
+    
+        void setLastPose(Eigen::Vector3f pose){ this->last_pose = pose; };
 
     private:
-        float weight; // particle's current weight
+        double weight; // particle's current weight
         Eigen::Vector3f pose; // particle's pose (x, y, thetha)
+        Eigen::Vector3f last_pose;
         Map map; // particle's estimated grid map of the environment
         Eigen::MatrixX2f measurement_estimate; // array of measurement values
+        vector<Eigen::Vector3f> samples; // samples around the reported scan-matching pose
+        vector<Eigen::MatrixX2f> sample_measurement_estimates; // measurement estimates of the samples
     
 };
 

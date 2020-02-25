@@ -18,8 +18,15 @@ using namespace std;
 
 Particle::Particle() {
     
-    this->weight = 0.;
+    int n_samples = 20;
+    this->weight = 1.0;
     this->pose = Eigen::Array3f::Zero();
+    this->last_pose = Eigen::Array3f::Zero();
+    
+    for (int i = 0; i < n_samples; i++){
+        this->samples.push_back(Eigen::Vector3f::Zero());
+        this->sample_measurement_estimates.push_back(Eigen::MatrixX2f::Zero(91, 2));
+    }
     
 }
 
