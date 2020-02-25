@@ -11,6 +11,7 @@
 #include <Eigen/Eigen>
 #include <iostream>
 #include <math.h>
+#include <opencv2/opencv.hpp>
 #include <numeric>
 
 #include "ScanMatcher.h"
@@ -59,6 +60,60 @@ void ScanMatcher::summary(){
 // ++++++++++++++++++++++++++++++++++++++++ Iterative Closest Point ++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+void draw_scan_matching(Eigen::MatrixX2f A, Eigen::MatrixX2f B){
+    
+    Eigen::VectorXf max_A = A.colwise().maxCoeff();
+    Eigen::VectorXf min_A = A.colwise().minCoeff();
+    Eigen::VectorXf max_B = B.colwise().maxCoeff();
+    Eigen::VectorXf min_B = B.colwise().minCoeff();
+    float x_min_A = min_A(0);
+    float y_min_A = min_A(1);
+    float x_max_A = max_A(0);
+    float y_max_A = max_A(1);
+    float x_min_B = min_B(0);
+    float y_min_B = min_B(1);
+    float x_max_B = max_B(0);
+    float y_max_B = max_B(1);
+    float x_min = min(x_min_A, x_min_B);
+    float y_min = min(y_min_A, y_min_B);
+    float x_max = min(x_max_A, x_max_B);
+    float y_max = min(y_max_A, y_max_B);
+    
+    float width_factor;
+    float height_factor;
+    if ((x_max - x_min) > (y_max - y_min)){
+        width_factor = 1.0;
+        height_factor = (float)(y_max - y_min) / (float)(x_max - x_min);
+    }
+    else {
+        height_factor = 1.0;
+        width_factor = (float)(x_max - x_min) / (float)(y_max - y_min);
+    }
+
+    int width = (int) (600 * width_factor);
+    int height = (int) (600 * height_factor);
+    cv::Mat canvas = cv::Mat(height, width, CV_8UC3, cv::Scalar::all(255));
+    for(int ref_id = 0; ref_id < B.rows(); ref_id++){
+
+        float x_a = A(ref_id, 0);
+        float y_a = A(ref_id, 1);
+        int x_a_d = (int)((x_a - x_min) / (x_max - x_min) * (width - 100) + 50);
+        int y_a_d = (int)((y_a - y_min) / (y_max - y_min) * (height - 100) + 50);
+        float x_b = B(ref_id, 0);
+        float y_b = B(ref_id, 1);
+        int x_b_d = (int)((x_b - x_min) / (x_max - x_min) * (width - 100) + 50);
+        int y_b_d = (int)((y_b - y_min) / (y_max - y_min) * (height - 100) + 50);
+        cv::circle(canvas, {x_a_d, y_a_d}, 2, {0, 255, 0}, 2);
+        cv::circle(canvas, {x_b_d, y_b_d}, 2, {0, 0, 255}, 2);
+
+    }
+    cv::imshow("ScanMatching", canvas);
+    cv::waitKey();
+    
+}
+
+
 // Compute pose correction
 Eigen::Vector3f ScanMatcher::ICP(Eigen::MatrixX2f &measurement_estimate, Eigen::MatrixX2f &measurement, const Eigen::Vector3f R){
     
@@ -98,18 +153,23 @@ Eigen::Vector3f ScanMatcher::ICP(Eigen::MatrixX2f &measurement_estimate, Eigen::
     
     float prev_error = 0;
     float mean_error = 0;
+    Eigen::MatrixX2f A_trans = Eigen::MatrixX2f::Zero(A.rows(), A.cols());
+    A_trans = A.replicate(1, 1);
+
     for (int iter = 0; iter<this->max_iterations; iter++){
         
+        //draw_scan_matching(A_trans, B);
+        
         // Get neighbor information
-        nn_result nn_info = nearest_neighbor(A, B);
+        nn_result nn_info = nearest_neighbor(A_trans, B);
     
         // Homogeneous version of A
         Eigen::MatrixX3f A_hom = Eigen::MatrixX3f::Zero(A.rows(), A.cols()+1);
         A_hom(A_hom.rows()-1, A_hom.cols()-1) = 1.0;
-        A_hom.block(0,0, A.rows(), A.cols()) = A;
+        A_hom.block(0,0, A.rows(), A.cols()) = A_trans;
                 
         // Container for transformed point cloud A
-        Eigen::MatrixX2f A_trans = Eigen::MatrixX2f::Zero(A.rows(), A.cols());
+        //Eigen::MatrixX2f A_trans = Eigen::MatrixX2f::Zero(A.rows(), A.cols());
         
         // Version of B with nearest neighbor assigned to same index as in A
         Eigen::MatrixX2f B_ordered = Eigen::MatrixX2f::Zero(B.rows(), B.cols());
@@ -119,17 +179,18 @@ Eigen::Vector3f ScanMatcher::ICP(Eigen::MatrixX2f &measurement_estimate, Eigen::
         }
                 
         // Get best transformation matrix for current point clouds
-        T = fit_transform(A, B);
-                
+        Eigen::Matrix3f T_t = fit_transform(A_trans, B_ordered);
+                        
         // Get transformed point cloud A
-        A_hom = (T * A_hom.transpose()).transpose();
+        A_hom = (T_t * A_hom.transpose()).transpose();
         A_trans = A_hom.block(0,0, A.rows(), A.cols());
         
         // Compute mean error
         mean_error = accumulate(nn_info.distances.begin(), nn_info.distances.end(), 0.0)/ nn_info.distances.size();
-        if (abs(prev_error - mean_error) < this->tolerance){
+        if (abs(prev_error - mean_error) < this->tolerance || mean_error > prev_error){
             break;
         }
+        cout << "Mean Error: " << mean_error << endl;
         
         // Update prev_error with current error
         prev_error = mean_error;
@@ -137,7 +198,7 @@ Eigen::Vector3f ScanMatcher::ICP(Eigen::MatrixX2f &measurement_estimate, Eigen::
     }
     
     // Final transform
-    T = fit_transform(A, B);
+    T = fit_transform(A, A_trans);
 
     // Only apply pose correction if correction distance smaller than radius of 3 standard deviations of
     // motion model uncertainty
@@ -226,18 +287,18 @@ nn_result ScanMatcher::nearest_neighbor(const Eigen::MatrixX2f &A, const Eigen::
         // Iterate over all points in point cloud B
         for (int ref_id = 0; ref_id < B.rows(); ref_id++){
             
-            // Get reference point
-            Eigen::Array2f reference = B.block<1,2>(ref_id, 0).transpose();
-            
-            // Get difference vector and euclidean distance between points
-            Eigen::Vector2f dif_vector = point - reference;
-            float distance = dif_vector.squaredNorm();
-            
-            // Set new minumum index if new minumum distance
-            if (distance < min_distance){
-                min_distance = distance;
-                min_index = ref_id;
-            }
+                // Get reference point
+                Eigen::Array2f reference = B.block<1,2>(ref_id, 0).transpose();
+                
+                // Get difference vector and euclidean distance between points
+                Eigen::Vector2f dif_vector = point - reference;
+                float distance = dif_vector.squaredNorm();
+                
+                // Set new minumum index if new minumum distance
+                if (distance < min_distance){
+                    min_distance = distance;
+                    min_index = ref_id;
+                }
         }
         
         // Append nearest neighbor index and distance
