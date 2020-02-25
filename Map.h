@@ -46,6 +46,8 @@ class Map{
     
         // non-static getter functions
         cv::Mat& getData(){ return this->data; };
+        cv::Mat getDataCopy(){ return this->data; };
+        void setData(cv::Mat new_data){this->data = new_data; }; 
     
         // coordinate transform
         static Eigen::Array3f world2map(const Eigen::Array3f &world_pose);
